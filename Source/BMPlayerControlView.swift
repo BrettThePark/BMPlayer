@@ -525,12 +525,12 @@ open class BMPlayerControlView: UIView {
         
         currentTimeLabel.textColor  = UIColor.white
         currentTimeLabel.font       = UIFont.systemFont(ofSize: 12)
-        currentTimeLabel.text       = "00:00"
+        currentTimeLabel.text       = "00:00.00"
         currentTimeLabel.textAlignment = NSTextAlignment.center
         
         totalTimeLabel.textColor    = UIColor.white
         totalTimeLabel.font         = UIFont.systemFont(ofSize: 12)
-        totalTimeLabel.text         = "00:00"
+      totalTimeLabel.text         = "00:00.00"
         totalTimeLabel.textAlignment   = NSTextAlignment.center
         
         
@@ -637,7 +637,7 @@ open class BMPlayerControlView: UIView {
         currentTimeLabel.snp.makeConstraints { (make) in
             make.left.equalTo(playButton.snp.right)
             make.centerY.equalTo(playButton)
-            make.width.equalTo(40)
+            make.width.equalTo(60)
         }
         
         timeSlider.snp.makeConstraints { (make) in
@@ -654,7 +654,7 @@ open class BMPlayerControlView: UIView {
         totalTimeLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(currentTimeLabel)
             make.left.equalTo(timeSlider.snp.right).offset(5)
-            make.width.equalTo(40)
+            make.width.equalTo(60)
         }
         
         fullscreenButton.snp.makeConstraints { (make) in

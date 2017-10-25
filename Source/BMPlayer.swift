@@ -342,9 +342,9 @@ open class BMPlayer: UIView {
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         // breaks, should fix if want to have something from storyboard
-        //if let customControlView = classForCoder.storyBoardCustomControl() {
-        //    self.customControlView = customControlView
-        //}
+        if let customControlView = type(of: self).storyBoardCustomControl() {
+            self.customControlView = customControlView
+        }
         initUI()
         initUIData()
         configureVolume()
