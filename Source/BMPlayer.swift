@@ -16,6 +16,7 @@ public protocol BMPlayerDelegate : class {
     func bmPlayer(player: BMPlayer ,loadedTimeDidChange loadedDuration: TimeInterval, totalDuration: TimeInterval)
     func bmPlayer(player: BMPlayer ,playTimeDidChange currentTime : TimeInterval, totalTime: TimeInterval)
     func bmPlayer(player: BMPlayer ,playerIsPlaying playing: Bool)
+    func bmPlayer(player: BMPlayer, playerIsFullScreen fullScreen: Bool)
 }
 
 /**
@@ -73,7 +74,7 @@ open class BMPlayer: UIView {
     
     fileprivate var isFullScreen:Bool {
         get {
-            return UIApplication.shared.statusBarOrientation.isLandscape
+            return controlView.fullscreenButton.isSelected
         }
     }
     
@@ -319,6 +320,7 @@ open class BMPlayer: UIView {
     }
     
     @objc fileprivate func fullScreenButtonPressed() {
+      
         controlView.updateUI(!self.isFullScreen)
         if isFullScreen {
             UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
@@ -329,6 +331,7 @@ open class BMPlayer: UIView {
             UIApplication.shared.setStatusBarHidden(false, with: .fade)
             UIApplication.shared.statusBarOrientation = .landscapeRight
         }
+        delegate?.bmPlayer(player: self, playerIsFullScreen: self.isFullScreen)
     }
     
     // MARK: - 生命周期
