@@ -235,7 +235,7 @@ open class BMPlayerControlView: UIView {
         UIView.animate(withDuration: 0.3, animations: {
             self.topMaskView.alpha    = alpha
             self.bottomMaskView.alpha = alpha
-            self.mainMaskView.backgroundColor = UIColor ( red: 0.0, green: 0.0, blue: 0.0, alpha: isShow ? 0.4 : 0.0)
+            self.mainMaskView.backgroundColor = UIColor ( red: 0.0, green: 0.0, blue: 0.0, alpha: isShow ? 0.1 : 0.0)
             
             if isShow {
                 if self.isFullscreen { self.chooseDefitionView.alpha = 1.0 }

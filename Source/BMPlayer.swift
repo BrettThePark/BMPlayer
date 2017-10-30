@@ -14,7 +14,7 @@ import MediaPlayer
 public protocol BMPlayerDelegate : class {
     func bmPlayer(player: BMPlayer ,playerStateDidChange state: BMPlayerState)
     func bmPlayer(player: BMPlayer ,loadedTimeDidChange loadedDuration: TimeInterval, totalDuration: TimeInterval)
-    func bmPlayer(player: BMPlayer ,playTimeDidChange currentTime : TimeInterval, totalTime: TimeInterval)
+  func bmPlayer(player: BMPlayer ,playTimeDidChange currentTime : TimeInterval, totalTime: TimeInterval, fromSeek:Bool)
     func bmPlayer(player: BMPlayer ,playerIsPlaying playing: Bool)
     func bmPlayer(player: BMPlayer, playerIsFullScreen fullScreen: Bool)
 }
@@ -174,10 +174,10 @@ open class BMPlayer: UIView {
      
      - parameter to: target time
      */
-    open func seek(_ to:TimeInterval, completion: (()->Void)? = nil) {
-        playerLayer?.seek(to: to, completion: completion)
+    open func seek(_ to:TimeInterval, fromSeek:Bool = false, completion: (()->Void)? = nil) {
+        playerLayer?.seek(to: to, fromSeek:fromSeek, completion: completion)
     }
-    
+  
     /**
      update UI to fullScreen
      */
@@ -273,11 +273,11 @@ open class BMPlayer: UIView {
                 isSliderSliding = false
                 if isPlayToTheEnd {
                     isPlayToTheEnd = false
-                    seek(self.sumTime, completion: {
+                    seek(self.sumTime,fromSeek:true, completion: {
                         self.play()
                     })
                 } else {
-                    seek(self.sumTime, completion: {
+                  seek(self.sumTime,fromSeek:true, completion: {
                         self.autoPlay()
                     })
                 }
@@ -427,10 +427,10 @@ extension BMPlayer: BMPlayerLayerViewDelegate {
         playStateDidChange?(player.isPlaying)
     }
     
-    public func bmPlayer(player: BMPlayerLayerView ,loadedTimeDidChange loadedDuration: TimeInterval , totalDuration: TimeInterval) {
+  public func bmPlayer(player: BMPlayerLayerView ,loadedTimeDidChange loadedDuration: TimeInterval , totalDuration: TimeInterval) {
         BMPlayerManager.shared.log("loadedTimeDidChange - \(loadedDuration) - \(totalDuration)")
         controlView.loadedTimeDidChange(loadedDuration: loadedDuration , totalDuration: totalDuration)
-        delegate?.bmPlayer(player: self, loadedTimeDidChange: loadedDuration, totalDuration: totalDuration)
+    delegate?.bmPlayer(player: self, loadedTimeDidChange: loadedDuration, totalDuration: totalDuration)
         controlView.totalDuration = totalDuration
         self.totalDuration = totalDuration
     }
@@ -469,9 +469,9 @@ extension BMPlayer: BMPlayerLayerViewDelegate {
     
     
     
-    public func bmPlayer(player: BMPlayerLayerView, playTimeDidChange currentTime: TimeInterval, totalTime: TimeInterval) {
+    public func bmPlayer(player: BMPlayerLayerView, playTimeDidChange currentTime: TimeInterval, totalTime: TimeInterval, fromSeek:Bool) {
         BMPlayerManager.shared.log("playTimeDidChange - \(currentTime) - \(totalTime)")
-        delegate?.bmPlayer(player: self, playTimeDidChange: currentTime, totalTime: totalTime)
+      delegate?.bmPlayer(player: self, playTimeDidChange: currentTime, totalTime: totalTime, fromSeek:fromSeek)
         self.currentPosition = currentTime
         totalDuration = totalTime
         if isSliderSliding {
@@ -547,12 +547,12 @@ extension BMPlayer: BMPlayerControlViewDelegate {
             
             if isPlayToTheEnd {
                 isPlayToTheEnd = false
-                seek(target, completion: {
+                seek(target, fromSeek:true, completion: {
                     self.play()
                 })
                 controlView.hidePlayToTheEndView()
             } else {
-                seek(target, completion: {
+              seek(target, fromSeek:true, completion: {
                     self.autoPlay()
                 })
             }

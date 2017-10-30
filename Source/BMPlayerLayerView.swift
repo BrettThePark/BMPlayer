@@ -45,7 +45,7 @@ public enum BMPlayerAspectRatio : Int {
 public protocol BMPlayerLayerViewDelegate : class {
     func bmPlayer(player: BMPlayerLayerView ,playerStateDidChange state: BMPlayerState)
     func bmPlayer(player: BMPlayerLayerView ,loadedTimeDidChange  loadedDuration: TimeInterval , totalDuration: TimeInterval)
-    func bmPlayer(player: BMPlayerLayerView ,playTimeDidChange    currentTime   : TimeInterval , totalTime: TimeInterval)
+  func bmPlayer(player: BMPlayerLayerView ,playTimeDidChange    currentTime   : TimeInterval , totalTime: TimeInterval, fromSeek:Bool)
     func bmPlayer(player: BMPlayerLayerView ,playerIsPlaying      playing: Bool)
 }
 
@@ -213,7 +213,7 @@ open class BMPlayerLayerView: UIView {
         }
     }
     
-    open func seek(to secounds: TimeInterval, completion:(()->Void)?) {
+  open func seek(to secounds: TimeInterval, fromSeek:Bool = false, completion:(()->Void)?) {
         if secounds.isNaN {
             return
         }
@@ -222,6 +222,9 @@ open class BMPlayerLayerView: UIView {
             let draggedTime = CMTimeMake(Int64(secounds * 100), 100)
             self.player!.seek(to: draggedTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero, completionHandler: { (finished) in
                 completion?()
+                if fromSeek {
+                  self.updateTimedUIs(fromSeek: true)
+                }
             })
         } else {
             self.shouldSeekTo = secounds
@@ -292,16 +295,20 @@ open class BMPlayerLayerView: UIView {
     
     // MARK: - 计时器事件
     @objc fileprivate func playerTimerAction() {
-        if let playerItem = playerItem {
-            if playerItem.duration.timescale != 0 {
-                let currentTime = CMTimeGetSeconds(self.player!.currentTime())
-                let totalTime   = TimeInterval(playerItem.duration.value) / TimeInterval(playerItem.duration.timescale)
-                delegate?.bmPlayer(player: self, playTimeDidChange: currentTime, totalTime: totalTime)
-            }
-            updateStatus(inclodeLoading: true)
-        }
+      updateTimedUIs(fromSeek: false)
     }
-    
+  
+    fileprivate func updateTimedUIs(fromSeek:Bool) {
+      if let playerItem = playerItem {
+        if playerItem.duration.timescale != 0 {
+          let currentTime = CMTimeGetSeconds(self.player!.currentTime())
+          let totalTime   = TimeInterval(playerItem.duration.value) / TimeInterval(playerItem.duration.timescale)
+          delegate?.bmPlayer(player: self, playTimeDidChange: currentTime, totalTime: totalTime, fromSeek:fromSeek)
+        }
+        updateStatus(inclodeLoading: true)
+      }
+    }
+  
     fileprivate func updateStatus(inclodeLoading: Bool = false) {
         if let player = player {
             if let playerItem = playerItem {
@@ -337,7 +344,7 @@ open class BMPlayerLayerView: UIView {
             if let playerItem = playerItem {
                 delegate?.bmPlayer(player: self,
                                    playTimeDidChange: CMTimeGetSeconds(playerItem.duration),
-                                   totalTime: CMTimeGetSeconds(playerItem.duration))
+                                   totalTime: CMTimeGetSeconds(playerItem.duration), fromSeek:false)
             }
             
             self.state = .playedToTheEnd
